@@ -164,7 +164,7 @@ Mac / Linux (Bash)
 
 It creates one managed identity in each resource group with one federated credential each. The dev credential trusts only jobs that run inside the `dev` GitHub Environment, and the same for test and prod. So the prod identity, the only one with rights on the prod group, is only reachable from a job a reviewer has approved. Each identity gets Foundry Owner on its own group and nothing else. Foundry Owner covers `az deployment group create`, the Foundry account, and the agents inside it.
 
-4. Wait about ten minutes for the role assignments to propagate, then push a change or start the Release workflow from the Actions tab.
+4. Wait about ten minutes for the role assignments to propagate, then push a change or start the Release workflow from the Actions tab. If the first run fails at the login step with "No subscriptions found", it was too early. Rerun it.
 
 Federated credential subjects: GitHub issues an immutable subject for repos created after July 2026, `repo:OWNER@OWNER-ID/REPO@REPO-ID:environment:NAME`. The script reads both ids with `gh api` and builds that subject. If the first login fails with `AADSTS70021`, the error shows the subject GitHub sent. Compare it with `az identity federated-credential list`.
 
@@ -234,7 +234,7 @@ The script lists the three resource groups, asks you to type DELETE, and deletes
 
 ## When to use this topology
 
-Use three resource groups when the agent has real users. Each environment has its own account, quota, project, identity, and role assignments. A developer with rights on the dev group cannot see or change prod. Cost reports split per group. Prod capacity is prod's alone.
+Use three resource groups when the agent has real users. Each environment has its own account, quota, project, identity, and role assignments. A developer with rights on the dev group cannot see or change prod. Cost reports split per group. Prod capacity is prod's alone. Deployments only queue behind deployments to the same environment, so a dev push never waits for a prod job.
 
 Do not use it for a throwaway prototype where the extra groups slow you down. Project `02-prompt-agent-single-rg` shows the same agent in one project with a fraction of the setup.
 
