@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 
 from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import PromptAgentDefinition
+from azure.ai.projects.models import PromptAgentDefinition, WebSearchTool
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 
@@ -30,6 +30,7 @@ version = project.agents.create_version(
     definition=PromptAgentDefinition(
         model="chat-model",
         instructions=(ROOT / "agent" / "instructions.md").read_text(encoding="utf-8"),
+        tools=[WebSearchTool()]
     ),
     metadata={"env": args.env, "git_sha": os.environ.get("GITHUB_SHA", "local")[:12]},
 )
